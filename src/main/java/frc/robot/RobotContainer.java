@@ -125,7 +125,7 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
     */
-    PathPlannerPath path = PathPlannerPath.fromPathFile("Example");
+    PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
     return AutoBuilder.followPathWithEvents(path);
   }
   
