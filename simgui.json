@@ -15,7 +15,32 @@
   },
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Auto": "String Chooser",
+      "/SmartDashboard/Gyro": "Gyro"
+    },
+    "windows": {
+      "/SmartDashboard/Gyro": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
+    "transitory": {
+      "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "Gyro": {
+          "open": true
+        },
+        "open": true
+      }
     }
   },
   "Plot": {

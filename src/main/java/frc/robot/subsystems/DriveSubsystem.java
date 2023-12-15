@@ -101,6 +101,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pigeon Roll", m_gyro.getRoll().getValueAsDouble());
     SmartDashboard.putNumber("Pigeon Yaw", m_gyro.getYaw().getValueAsDouble());
     SmartDashboard.putNumber("Pigeon Pitch", m_gyro.getPitch().getValueAsDouble());
+    SmartDashboard.putData("Gyro", m_gyro);
     SmartDashboard.putNumber("Angle", m_gyro.getAngle());
     // Update the odometry in the periodic block
     m_odometry.update(
