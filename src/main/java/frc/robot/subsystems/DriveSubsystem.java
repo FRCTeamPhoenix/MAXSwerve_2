@@ -98,9 +98,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-   //     SmartDashboard.putNumber("Pigeon Roll", m_gyro.getRoll());
-  //  SmartDashboard.putNumber("Pigeon Yaw", m_gyro.getYaw());
- //   SmartDashboard.putNumber("Pigeon Pitch", m_gyro.getPitch());
+    SmartDashboard.putNumber("TEst", m_currentRotation);
+    SmartDashboard.putNumber("Pigeon Roll", m_gyro.getRoll().getValueAsDouble());
+    SmartDashboard.putNumber("Pigeon Yaw", m_gyro.getYaw().getValueAsDouble());
+    SmartDashboard.putNumber("Pigeon Pitch", m_gyro.getPitch().getValueAsDouble());
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getAngle()),
