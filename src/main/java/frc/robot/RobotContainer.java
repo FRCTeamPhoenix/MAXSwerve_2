@@ -77,6 +77,10 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+    new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+        .onTrue(new RunCommand(
+            () -> m_robotDrive.zeroHeading(),
+            m_robotDrive));
   }
 
   /**
