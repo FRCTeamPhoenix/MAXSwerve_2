@@ -56,7 +56,16 @@
       "isLocked": false
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 2.05,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
