@@ -14,12 +14,24 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import frc.robot.Constants.AutoConstants;
+
 //import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathHolonomic;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import com.ctre.phoenix.sensors.*;
+//import com.ctre.phoenix6.hardware.*;
+
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -45,7 +57,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The gyro sensor
   // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-  private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(DriveConstants.kPigeon2CanId);
+  private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(DriveConstants.kPigeon2CanId,"rio");
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -59,7 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getAngle()),
+      Rotation2d.fromDegrees(m_gyro.getYaw()),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
@@ -69,11 +81,31 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+
+    AutoBuilder.configureHolonomic(
+      this::getPose, // Robot pose supplier
+      this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+      this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+      this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+      new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+          new PIDConstants(AutoConstants.kPXController, 0.0, 0.0), // Translation PID constants
+          new PIDConstants(AutoConstants.kPThetaController, 0.0, 0.0), // Rotation PID constants
+          4.8, // Max module speed, in m/s
+          0.46, // Drive base radius in meters. Distance from robot center to furthest module.
+          new ReplanningConfig() // Default path replanning config. See the API for the options here
+      ),
+      this // Reference to this subsystem to set requirements
+    );
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Yaw", m_gyro.getYaw());
+
+    SmartDashboard.putNumber("Pigeon Roll", m_gyro.getRoll());
+    SmartDashboard.putNumber("Pigeon Yaw", m_gyro.getYaw());
+    SmartDashboard.putNumber("Pigeon Pitch", m_gyro.getPitch());
+    SmartDashboard.putData("Gyro", m_gyro);
+
     // Update the odometry in the periodic block
     SmartDashboard.putData("Gyro", m_gyro);
     m_odometry.update(
@@ -192,6 +224,13 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
+  public void driveRobotRelative(ChassisSpeeds speeds){
+    this.drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,false,false);
+  }
+  public ChassisSpeeds getRobotRelativeSpeeds(){
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(m_frontLeft.getState(), m_frontRight.getState(), m_rearLeft.getState(),m_rearRight.getState());
+  }
+
   /**
    * Sets the wheels into an X formation to prevent movement.
    */
@@ -235,7 +274,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
+    return Rotation2d.fromDegrees(m_gyro.getYaw()).getDegrees();
   }
 
   /**

@@ -24,16 +24,27 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
-
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+
+
 public class RobotContainer {
   // The robot's subsystems
+  
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("ChargerDance");
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -44,6 +55,9 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    //Add Autos
+    SmartDashboard.putData("Auto", autoChooser);
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -68,10 +82,22 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
+    //Force robot to stop in X formation
+    new JoystickButton(m_driverController, XboxController.Button.kX.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+    //Reset the Gyro to zero heading with the Right Bumper
+    new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+        .onTrue(new RunCommand(
+            () -> m_robotDrive.zeroHeading(),
+            m_robotDrive));
+    //Change Field/Robot Orientation (Not sure we want this)
+/*    new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+        .onTrue(new RunCommand(
+            () -> m_robotDrive.(),
+            m_robotDrive)); */
+            
   }
 
   /**
@@ -80,6 +106,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
+    /* 
     // Create config for trajectory
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
@@ -118,5 +146,9 @@ public class RobotContainer {
 
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
+    */
+    //PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
+    //return AutoBuilder.followPathWithEvents(path);
   }
+  
 }
