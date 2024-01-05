@@ -17,21 +17,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.Constants.AutoConstants;
 
-//import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathHolonomic;
-import com.pathplanner.lib.commands.FollowPathWithEvents;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import com.ctre.phoenix.sensors.*;
+import com.ctre.phoenix.sensors.*;  // Firmware Pigeon2-vS-Application-22.7.3.0-season2023.crf (Phoenix 5)
 //import com.ctre.phoenix6.hardware.*;
-
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
