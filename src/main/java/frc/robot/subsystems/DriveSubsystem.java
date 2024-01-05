@@ -14,7 +14,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import frc.robot.Constants.AutoConstants;
+
 //import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
@@ -98,11 +100,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     SmartDashboard.putNumber("Pigeon Roll", m_gyro.getRoll());
     SmartDashboard.putNumber("Pigeon Yaw", m_gyro.getYaw());
     SmartDashboard.putNumber("Pigeon Pitch", m_gyro.getPitch());
     SmartDashboard.putData("Gyro", m_gyro);
+
     // Update the odometry in the periodic block
+    SmartDashboard.putData("Gyro", m_gyro);
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getYaw()),
         new SwerveModulePosition[] {
