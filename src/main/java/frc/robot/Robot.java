@@ -56,14 +56,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+        LimeLight limeLight = m_robotContainer.getm_limeLight();
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     SmartDashboard.putBoolean("Tracking: ", m_robotContainer.getxboxDriver().getAButton());
+    SmartDashboard.putNumber("Steer: ", limeLight.m_LimelightSteerCommand);
+    SmartDashboard.putNumber("Drive: ", limeLight.m_LimelightDriveCommand);
 
     CommandScheduler.getInstance().run();
-    LimeLight limeLight = m_robotContainer.getm_limeLight();
     limeLight.Update_Limelight_Tracking();
     boolean trackTarget = m_robotContainer.getxboxDriver().getAButton();
     DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
@@ -72,7 +74,7 @@ public class Robot extends TimedRobot {
           // m_drive.drive(0.5, 0.0, 0.0, true, false);
           if (limeLight.hasValidTarget())
           {
-            m_drive.drive(limeLight.m_LimelightDriveCommand, 0.0, 0.0, true, false);
+            m_drive.drive(limeLight.m_LimelightDriveCommand, 0.0, limeLight.m_LimelightSteerCommand, false, false);
           //   new RunCommand(
           //     () -> m_drive.drive(
           //         -MathUtil.applyDeadband(-.2, OIConstants.kDriveDeadband),
@@ -83,7 +85,7 @@ public class Robot extends TimedRobot {
           }
           else
           {
-                m_drive.drive(0.0, 0.0, 0.0, true, false);
+                m_drive.drive(0.0, 0.0, 0.0, false, false);
           }
         }
   }

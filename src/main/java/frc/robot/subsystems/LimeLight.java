@@ -31,11 +31,12 @@ private double m_targetArea = 0.0;
 
     public void Update_Limelight_Tracking(){
         // These numbers must be tuned for your Robot!  Be careful!
-        final double STEER_K = 0.2;                  // How hard to turn toward the target
-        final double DRIVE_K = 0.1;                    // How hard to drive fwd toward the target
-        final double DESIRED_TARGET_AREA = 1;        // Area of the target when the robot reaches the wall
-        final double MAX_FORWARD_DRIVE = 0.1;   
-        final double MAX_REVERSE_DRIVE = -0.1;        // Simple speed limit so we don't drive too fast
+        final double STEER_K = 0.005;                  // How hard to turn toward the target
+        final double DRIVE_K = 0.3;                    // How hard to drive fwd toward the target
+        final double DESIRED_TARGET_AREA = 2.5;
+        final double HEADING_DELTA = 10;        // Area of the target when the robot reaches the wall
+        final double MAX_FORWARD_DRIVE = 0.3;   
+        final double MAX_REVERSE_DRIVE = -0.3;        // Simple speed limit so we don't drive too fast
 
         double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
         double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
@@ -53,10 +54,6 @@ private double m_targetArea = 0.0;
 
         m_LimelightHasValidTarget = true;
 
-        // Start with proportional steering
-        double steer_cmd = tx * STEER_K;
-        m_LimelightSteerCommand = steer_cmd;
-
         // Try to drive forward until the target area reaches our desired area
         double drive_cmd = (DESIRED_TARGET_AREA - ta) * DRIVE_K;
 
@@ -70,6 +67,17 @@ private double m_targetArea = 0.0;
           drive_cmd = MAX_FORWARD_DRIVE;
         }
         m_LimelightDriveCommand = drive_cmd;
+
+        if (Math.floor(DESIRED_TARGET_AREA - ta) != 0) {
+            // Start with proportional steering
+            if (Math.abs(tx) >= HEADING_DELTA) {
+              double steer_cmd = (-tx) * STEER_K;
+              m_LimelightSteerCommand = steer_cmd;
+            }
+            else {
+              m_LimelightSteerCommand = 0.0;
+            }
+        }
   }
 
   public boolean hasValidTarget() {
