@@ -12,7 +12,7 @@ public class LimeLight extends SubsystemBase {
 private boolean m_LimelightHasValidTarget = false;
 public double m_LimelightDriveX = 0.0;
 public double m_LimelightDriveY = 0.0;
-public double m_LimelightSteerCommand = 0.0;
+public double m_LimelightDriveRot = 0.0;
 public double m_targetArea = 0.0;
 public double m_distanceToTarget;
 
@@ -34,11 +34,12 @@ public double m_distanceToTarget;
 
     public void Update_Limelight_Tracking(){
         // These numbers must be tuned for your Robot!  Be careful!
-        // final double STEER_K = 0.005;                  // How hard to turn toward the target
+        final double STEER_K = 0.01;                  // How hard to turn toward the target
         final double DRIVE_K = 0.4;                    // How hard to drive fwd toward the target
         final double DESIRED_TARGET_DISTANCE = 0.5;
         final double DESIRED_HEADING = 0;        // Area of the target when the robot reaches the wall
         final double MAX_DRIVE = 0.4;
+        final double MAX_STEER = 0.1;
 
         double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
         double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
@@ -56,29 +57,33 @@ public double m_distanceToTarget;
         m_distanceToTarget = distance;
 
         double errAngle = DESIRED_HEADING - tx;
-        if (Math.abs(errAngle) < 0.25) {
+        if (Math.abs(errAngle) < 2) {
           errAngle = 0;
         }
 
-        // if (distance > DESIRED_TARGET_DISTANCE){
-          double speed = Math.abs(DRIVE_K * errDistance);
-          double x = (errDistance * Math.cos(errAngle * (Math.PI / 180))) * speed;
-          if (x > MAX_DRIVE) {
-            x = MAX_DRIVE;
-          }
-          else if (x < -MAX_DRIVE) {
-            x = -MAX_DRIVE;
-          }
-          m_LimelightDriveX = x;
-          double y = (errDistance * Math.sin(errAngle * (Math.PI / 180))) * speed;
-          if (y > MAX_DRIVE) {
-            y = MAX_DRIVE;
-          }
-          else if (y < -MAX_DRIVE) {
-            y = -MAX_DRIVE;
-          }
-          m_LimelightDriveY = y;
-        // }
+        double speed = Math.abs(DRIVE_K * errDistance);
+        double x = (errDistance * Math.cos(errAngle * (Math.PI / 180))) * speed;
+        if (x > MAX_DRIVE) {
+          x = MAX_DRIVE;
+        }
+        else if (x < -MAX_DRIVE) {
+          x = -MAX_DRIVE;
+        }
+        m_LimelightDriveX = x;
+
+        double y = (errDistance * Math.sin(errAngle * (Math.PI / 180))) * speed;
+        if (y > MAX_DRIVE) {
+          y = MAX_DRIVE;
+        }
+        else if (y < -MAX_DRIVE) {
+          y = -MAX_DRIVE;
+        }
+        m_LimelightDriveY = y;
+
+        double rotate = (errAngle * STEER_K);
+        if (rotate > MAX_STEER) rotate = MAX_STEER;
+        else if (rotate < -MAX_STEER) rotate = -MAX_STEER;
+        m_LimelightDriveRot = rotate;
   }
 
   public boolean hasValidTarget() {
@@ -90,7 +95,7 @@ public double m_distanceToTarget;
   //}
 
   public double getLLTurnSpeed() {
-    return m_LimelightSteerCommand;
+    return m_LimelightDriveRot;
   }
 
   public double getLLTargetArea() {
