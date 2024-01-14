@@ -35,7 +35,7 @@ private double m_targetArea = 0.0;
         final double STEER_K = 0.005;                  // How hard to turn toward the target
         final double DRIVE_K = 0.3;                    // How hard to drive fwd toward the target
         final double DESIRED_TARGET_AREA = 2.5;
-        final double DESIRED_HEADING = 0;        // Area of the target when the robot reaches the wall
+        final double HEADING_DELTA = 10;        // Area of the target when the robot reaches the wall
         final double MAX_DRIVE = 0.3;
 
         double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
@@ -44,27 +44,14 @@ private double m_targetArea = 0.0;
         double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
         m_targetArea = ta;
 
-        double errArea = DESIRED_TARGET_AREA - ta;
-        if (Math.abs(errArea) < 0.25) {
-          errArea = 0;
-        }
-
-        double errAngle = DESIRED_HEADING - tx;
-        if (Math.abs(errAngle) < 1) {
-          errAngle = 0;
-        }
+        double err = DESIRED_TARGET_AREA - ta;
+        if (Math.abs(err) < HEADING_DELTA) err = 0;
 
         if (ta > DESIRED_TARGET_AREA){
           double speed = DRIVE_K * Math.sqrt(ta);
-          double x = errArea * Math.cos(errAngle);
-          if (Math.abs(x) < MAX_DRIVE) {
-            x = MAX_DRIVE;
-          }
+          double x = tx * Math.cos(err);
           m_LimelightDriveX = x;
-          double y = errArea * Math.sin(errAngle);
-          if (Math.abs(y) < MAX_DRIVE) {
-            y = MAX_DRIVE;
-          }
+          double y = tx * Math.sin(err);
           m_LimelightDriveY = y;
         }
   }
