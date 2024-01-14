@@ -9,9 +9,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class LimeLight extends SubsystemBase {
 
 private boolean m_LimelightHasValidTarget = false;
-public double m_LimelightDriveCommand = 0.0;
+public double m_LimelightDriveX = 0.0;
+public double m_LimelightDriveY = 0.0;
 public double m_LimelightSteerCommand = 0.0;
-private double m_targetArea = 0.0;
+public double m_targetArea = 0.0;
 
     public void limeLight() {
 
@@ -34,9 +35,8 @@ private double m_targetArea = 0.0;
         final double STEER_K = 0.005;                  // How hard to turn toward the target
         final double DRIVE_K = 0.3;                    // How hard to drive fwd toward the target
         final double DESIRED_TARGET_AREA = 2.5;
-        final double HEADING_DELTA = 10;        // Area of the target when the robot reaches the wall
-        final double MAX_FORWARD_DRIVE = 0.3;   
-        final double MAX_REVERSE_DRIVE = -0.3;        // Simple speed limit so we don't drive too fast
+        final double DESIRED_HEADING = 0;        // Area of the target when the robot reaches the wall
+        final double MAX_DRIVE = 0.3;
 
         double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
         double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
@@ -44,39 +44,34 @@ private double m_targetArea = 0.0;
         double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
         m_targetArea = ta;
 
-        if (tv < 1.0)
-        {
-          m_LimelightHasValidTarget = false;
-          m_LimelightDriveCommand = 0.0;
-          m_LimelightSteerCommand = 0.0;
-          return;
+        double errArea = DESIRED_TARGET_AREA - ta;
+        if (Math.abs(errArea) < 0.25) {
+          errArea = 0;
         }
 
-        m_LimelightHasValidTarget = true;
-
-        // Try to drive forward until the target area reaches our desired area
-        double drive_cmd = (DESIRED_TARGET_AREA - ta) * DRIVE_K;
-
-        // Don't let the robot drive too fast into the goal
-        if (drive_cmd < MAX_REVERSE_DRIVE)
-        {
-          drive_cmd = MAX_REVERSE_DRIVE;
+        double errAngle = DESIRED_HEADING - tx;
+        if (Math.abs(errAngle) < 1) {
+          errAngle = 0;
         }
-        if (drive_cmd > MAX_FORWARD_DRIVE)
-        {
-          drive_cmd = MAX_FORWARD_DRIVE;
-        }
-        m_LimelightDriveCommand = drive_cmd;
 
-        if (Math.floor(DESIRED_TARGET_AREA - ta) != 0) {
-            // Start with proportional steering
-            if (Math.abs(tx) >= HEADING_DELTA) {
-              double steer_cmd = (-tx) * STEER_K;
-              m_LimelightSteerCommand = steer_cmd;
-            }
-            else {
-              m_LimelightSteerCommand = 0.0;
-            }
+        if (ta < DESIRED_TARGET_AREA){
+          double speed = DRIVE_K * Math.sqrt(ta);
+          double x = (Math.sqrt(errArea) * Math.cos(errAngle)) * speed;
+          if (x > MAX_DRIVE) {
+            x = MAX_DRIVE;
+          }
+          else if (x < -MAX_DRIVE) {
+            x = -MAX_DRIVE;
+          }
+          m_LimelightDriveX = x;
+          double y = (Math.sqrt(errArea) * Math.sin(errAngle)) * speed;
+          if (y > MAX_DRIVE) {
+            y = MAX_DRIVE;
+          }
+          else if (y < -MAX_DRIVE) {
+            y = -MAX_DRIVE;
+          }
+          m_LimelightDriveY = y;
         }
   }
 
@@ -84,9 +79,9 @@ private double m_targetArea = 0.0;
       return m_LimelightHasValidTarget;
   }
 
-  public double getLLDriveSpeed() {
-    return m_LimelightDriveCommand;
-  }
+ // public double getLLDriveSpeed() {
+    //return m_LimelightDriveCommand;
+  //}
 
   public double getLLTurnSpeed() {
     return m_LimelightSteerCommand;

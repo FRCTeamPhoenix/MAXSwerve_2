@@ -63,7 +63,10 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     SmartDashboard.putBoolean("Tracking: ", m_robotContainer.getxboxDriver().getAButton());
     SmartDashboard.putNumber("Steer: ", limeLight.m_LimelightSteerCommand);
-    SmartDashboard.putNumber("Drive: ", limeLight.m_LimelightDriveCommand);
+    SmartDashboard.putNumber("DriveX: ", limeLight.m_LimelightDriveX);
+    SmartDashboard.putNumber("DriveY: ", limeLight.m_LimelightDriveY);
+    SmartDashboard.putNumber("TA: ", limeLight.m_targetArea);
+
 
     CommandScheduler.getInstance().run();
     limeLight.Update_Limelight_Tracking();
@@ -74,7 +77,7 @@ public class Robot extends TimedRobot {
           // m_drive.drive(0.5, 0.0, 0.0, true, false);
           if (limeLight.hasValidTarget())
           {
-            m_drive.drive(limeLight.m_LimelightDriveCommand, 0.0, limeLight.m_LimelightSteerCommand, false, false);
+            m_drive.drive(limeLight.m_LimelightDriveY, limeLight.m_LimelightDriveX, 0, false, false);
           //   new RunCommand(
           //     () -> m_drive.drive(
           //         -MathUtil.applyDeadband(-.2, OIConstants.kDriveDeadband),
