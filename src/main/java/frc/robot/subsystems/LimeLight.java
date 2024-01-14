@@ -9,8 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class LimeLight extends SubsystemBase {
 
 private boolean m_LimelightHasValidTarget = false;
-public double m_LimelightDriveX = 0.0;
-public double m_LimelightDriveY = 0.0;
+public double m_LimelightDriveCommand = 0.0;
 public double m_LimelightSteerCommand = 0.0;
 private double m_targetArea = 0.0;
 
@@ -36,7 +35,8 @@ private double m_targetArea = 0.0;
         final double DRIVE_K = 0.3;                    // How hard to drive fwd toward the target
         final double DESIRED_TARGET_AREA = 2.5;
         final double HEADING_DELTA = 10;        // Area of the target when the robot reaches the wall
-        final double MAX_DRIVE = 0.3;
+        final double MAX_FORWARD_DRIVE = 0.3;   
+        final double MAX_REVERSE_DRIVE = -0.3;        // Simple speed limit so we don't drive too fast
 
         double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
         double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
@@ -44,15 +44,39 @@ private double m_targetArea = 0.0;
         double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
         m_targetArea = ta;
 
-        double err = DESIRED_TARGET_AREA - ta;
-        if (Math.abs(err) < HEADING_DELTA) err = 0;
+        if (tv < 1.0)
+        {
+          m_LimelightHasValidTarget = false;
+          m_LimelightDriveCommand = 0.0;
+          m_LimelightSteerCommand = 0.0;
+          return;
+        }
 
-        if (ta > DESIRED_TARGET_AREA){
-          double speed = DRIVE_K * Math.sqrt(ta);
-          double x = tx * Math.cos(err);
-          m_LimelightDriveX = x;
-          double y = tx * Math.sin(err);
-          m_LimelightDriveY = y;
+        m_LimelightHasValidTarget = true;
+
+        // Try to drive forward until the target area reaches our desired area
+        double drive_cmd = (DESIRED_TARGET_AREA - ta) * DRIVE_K;
+
+        // Don't let the robot drive too fast into the goal
+        if (drive_cmd < MAX_REVERSE_DRIVE)
+        {
+          drive_cmd = MAX_REVERSE_DRIVE;
+        }
+        if (drive_cmd > MAX_FORWARD_DRIVE)
+        {
+          drive_cmd = MAX_FORWARD_DRIVE;
+        }
+        m_LimelightDriveCommand = drive_cmd;
+
+        if (Math.floor(DESIRED_TARGET_AREA - ta) != 0) {
+            // Start with proportional steering
+            if (Math.abs(tx) >= HEADING_DELTA) {
+              double steer_cmd = (-tx) * STEER_K;
+              m_LimelightSteerCommand = steer_cmd;
+            }
+            else {
+              m_LimelightSteerCommand = 0.0;
+            }
         }
   }
 
@@ -60,9 +84,9 @@ private double m_targetArea = 0.0;
       return m_LimelightHasValidTarget;
   }
 
- // public double getLLDriveSpeed() {
-    //return m_LimelightDriveCommand;
-  //}
+  public double getLLDriveSpeed() {
+    return m_LimelightDriveCommand;
+  }
 
   public double getLLTurnSpeed() {
     return m_LimelightSteerCommand;
