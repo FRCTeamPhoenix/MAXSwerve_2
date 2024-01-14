@@ -32,7 +32,7 @@ public double m_targetArea = 0.0;
 
     public void Update_Limelight_Tracking(){
         // These numbers must be tuned for your Robot!  Be careful!
-        final double STEER_K = 0.005;                  // How hard to turn toward the target
+        // final double STEER_K = 0.005;                  // How hard to turn toward the target
         final double DRIVE_K = 0.3;                    // How hard to drive fwd toward the target
         final double DESIRED_TARGET_AREA = 2.5;
         final double DESIRED_HEADING = 0;        // Area of the target when the robot reaches the wall
@@ -44,19 +44,24 @@ public double m_targetArea = 0.0;
         double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
         m_targetArea = ta;
 
+        if (tv != 0) m_LimelightHasValidTarget = true;
+        else m_LimelightHasValidTarget = false;
+
         double errArea = DESIRED_TARGET_AREA - ta;
         if (Math.abs(errArea) < 0.25) {
           errArea = 0;
         }
 
         double errAngle = DESIRED_HEADING - tx;
-        if (Math.abs(errAngle) < 1) {
+        if (Math.abs(errAngle) < 4) {
           errAngle = 0;
         }
 
+        double distanceToTarget = 1 / Math.sqrt(errArea);
+
         if (ta < DESIRED_TARGET_AREA){
-          double speed = DRIVE_K * Math.sqrt(ta);
-          double x = (Math.sqrt(errArea) * Math.cos(errAngle)) * speed;
+          double speed = DRIVE_K * distanceToTarget;
+          double x = (distanceToTarget * Math.cos(errAngle * (Math.PI / 180))) * speed;
           if (x > MAX_DRIVE) {
             x = MAX_DRIVE;
           }
@@ -64,7 +69,7 @@ public double m_targetArea = 0.0;
             x = -MAX_DRIVE;
           }
           m_LimelightDriveX = x;
-          double y = (Math.sqrt(errArea) * Math.sin(errAngle)) * speed;
+          double y = (distanceToTarget * Math.sin(errAngle * (Math.PI / 180))) * speed;
           if (y > MAX_DRIVE) {
             y = MAX_DRIVE;
           }
