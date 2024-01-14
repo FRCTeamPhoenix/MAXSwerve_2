@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LimeLight;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
@@ -66,6 +65,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("DriveX: ", limeLight.m_LimelightDriveX);
     SmartDashboard.putNumber("DriveY: ", limeLight.m_LimelightDriveY);
     SmartDashboard.putNumber("TA: ", limeLight.m_targetArea);
+    SmartDashboard.putNumber("Distance to target: ", limeLight.m_distanceToTarget);
 
 
     CommandScheduler.getInstance().run();
@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
           // m_drive.drive(0.5, 0.0, 0.0, true, false);
           if (limeLight.hasValidTarget())
           {
-            m_drive.drive(limeLight.m_LimelightDriveX, -limeLight.m_LimelightDriveY, 0, false, false);
+            m_drive.drive(limeLight.m_LimelightDriveX, limeLight.m_LimelightDriveY, 0, false, false);
           //   new RunCommand(
           //     () -> m_drive.drive(
           //         -MathUtil.applyDeadband(-.2, OIConstants.kDriveDeadband),
