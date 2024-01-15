@@ -21,6 +21,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LimeLight;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -37,12 +38,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotContainer {
   // The robot's subsystems
-  
+  public final LimeLight m_limeLight = new LimeLight();
+
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("ChargerDance");
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+
+  private final XboxController xbox_operator = new XboxController(1);
+  private final XboxController xbox_driver = new XboxController(0);
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -65,6 +71,8 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
+
+        
   }
 
   /**
@@ -96,5 +104,21 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public LimeLight getm_limeLight() {
+    return m_limeLight;
+  }
+
+  public XboxController getxboxDriver() {
+    return xbox_driver;
+  }
+
+  public XboxController getxboxOperator() {
+    return xbox_operator;
+  }
+
+  public DriveSubsystem getm_driveTrain(){
+    return m_robotDrive;
   }
 }
