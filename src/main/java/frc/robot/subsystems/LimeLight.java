@@ -9,11 +9,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class LimeLight extends SubsystemBase {
 
 private boolean m_LimelightHasValidTarget = false;
-public double m_LimelightDriveX = 0.0;
-public double m_LimelightDriveY = 0.0;
-public double m_LimelightDriveRot = 0.0;
-public double m_targetArea = 0.0;
-public double m_distanceToTarget;
+private double m_LimelightDriveX = 0.0;
+private double m_LimelightDriveY = 0.0;
+private double m_LimelightDriveRot = 0.0;
+private double m_targetArea = 0.0;
+private double m_distanceToTarget;
 
     public void limeLight() {
 
@@ -89,16 +89,25 @@ public double m_distanceToTarget;
       return m_LimelightHasValidTarget;
   }
 
- // public double getLLDriveSpeed() {
-    //return m_LimelightDriveCommand;
-  //}
+  public double getLLDriveX() {
+    return m_LimelightDriveX;
+  }
 
-  public double getLLTurnSpeed() {
+  public double getLLDriveY() {
+    return m_LimelightDriveY;
+  }
+
+
+  public double getLLDriveRotation() {
     return m_LimelightDriveRot;
   }
 
   public double getLLTargetArea() {
     return m_targetArea;
+  }
+
+  public double getLLTargetDistance() {
+    return m_distanceToTarget;
   }
 }
 

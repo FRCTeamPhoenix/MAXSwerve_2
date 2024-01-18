@@ -36,6 +36,9 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
 
 
+  private LimeLight currentLimeLight;
+  private String currentLimeLightString;
+  private double driveFlip;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -61,25 +64,38 @@ public class Robot extends TimedRobot {
     DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
     double[] pose = {m_drive.getPose().getX(), m_drive.getPose().getY(), m_drive.getPose().getRotation().getDegrees()};
 
+    double dPadError = 5;
+    if (m_robotContainer.getxboxDriver().getPOV() == 0 + dPadError || m_robotContainer.getxboxDriver().getPOV() == 0 - dPadError){
+      currentLimeLight = frontLimeLight;
+      currentLimeLightString = "Front";
+      driveFlip = 1;
+    }
+    else if (m_robotContainer.getxboxDriver().getPOV() == 180 + dPadError || m_robotContainer.getxboxDriver().getPOV() == 180 - dPadError){
+      currentLimeLight = rearLimeLight;
+      currentLimeLightString = "Rear";
+      driveFlip = -1;
+    }
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
-    SmartDashboard.putBoolean("Tracking: ", m_robotContainer.getxboxDriver().getAButton());
-    SmartDashboard.putNumber("Steer: ", frontLimeLight.m_LimelightDriveRot);
-    SmartDashboard.putNumber("DriveX: ", frontLimeLight.m_LimelightDriveX);
-    SmartDashboard.putNumber("DriveY: ", frontLimeLight.m_LimelightDriveY);
-    SmartDashboard.putNumber("TA: ", frontLimeLight.m_targetArea);
-    SmartDashboard.putNumber("Distance to target: ", frontLimeLight.m_distanceToTarget);
+    CommandScheduler.getInstance().run();
+    currentLimeLight.Update_Limelight_Tracking();
+    SmartDashboard.putNumber("Steer: ", currentLimeLight.getLLDriveRotation());
+    SmartDashboard.putNumber("DriveX: ", currentLimeLight.getLLDriveX());
+    SmartDashboard.putNumber("DriveY: ", currentLimeLight.getLLDriveY());
+    SmartDashboard.putNumber("TA: ", currentLimeLight.getLLTargetArea());
+    SmartDashboard.putNumber("Distance to target: ", currentLimeLight.getLLTargetDistance());
+    SmartDashboard.putString("Current LimeLight: ", currentLimeLightString);
     SmartDashboard.putNumberArray("RobotPose", pose);
     CommandScheduler.getInstance().run();
-    frontLimeLight.Update_Limelight_Tracking();
+    currentLimeLight.Update_Limelight_Tracking();
     boolean trackTarget = m_robotContainer.getxboxDriver().getAButton();
     if (trackTarget)
         {
-          if (frontLimeLight.hasValidTarget())
+          if (currentLimeLight.hasValidTarget())
           {
-            m_drive.drive(frontLimeLight.m_LimelightDriveX, frontLimeLight.m_LimelightDriveY, frontLimeLight.m_LimelightDriveRot, false, false);
+            m_drive.drive(currentLimeLight.getLLDriveX() * driveFlip, currentLimeLight.getLLDriveY() * driveFlip, currentLimeLight.getLLDriveRotation(), false, false);
           }
           else
           {
