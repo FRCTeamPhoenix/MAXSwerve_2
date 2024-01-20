@@ -35,10 +35,11 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-
+  private LimeLight frontLimeLight;
+  private LimeLight rearLimeLight;
   private LimeLight currentLimeLight;
-  private String currentLimeLightString;
-  private double driveFlip;
+  private String currentLimeLightString = "Front";
+  private double driveFlip = 1;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -48,6 +49,9 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    frontLimeLight = m_robotContainer.getm_frontLimeLight();
+    rearLimeLight = m_robotContainer.getm_rearLimeLight();
+    currentLimeLight = frontLimeLight;
   }
 
   /**
@@ -59,18 +63,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    LimeLight frontLimeLight = m_robotContainer.getm_frontLimeLight();
-    LimeLight rearLimeLight = m_robotContainer.getm_rearLimeLight();
+    frontLimeLight = m_robotContainer.getm_frontLimeLight();
+    rearLimeLight = m_robotContainer.getm_rearLimeLight();
     DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
     double[] pose = {m_drive.getPose().getX(), m_drive.getPose().getY(), m_drive.getPose().getRotation().getDegrees()};
 
-    double dPadError = 5;
-    if (m_robotContainer.getxboxDriver().getPOV() == 0 + dPadError || m_robotContainer.getxboxDriver().getPOV() == 0 - dPadError){
+    if (m_robotContainer.getxboxDriver().getPOV() == 0){
       currentLimeLight = frontLimeLight;
       currentLimeLightString = "Front";
       driveFlip = 1;
     }
-    else if (m_robotContainer.getxboxDriver().getPOV() == 180 + dPadError || m_robotContainer.getxboxDriver().getPOV() == 180 - dPadError){
+    else if (m_robotContainer.getxboxDriver().getPOV() == 180){
       currentLimeLight = rearLimeLight;
       currentLimeLightString = "Rear";
       driveFlip = -1;
