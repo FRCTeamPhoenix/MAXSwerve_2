@@ -5,7 +5,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
-
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -25,6 +25,13 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static final class DriveConstants {
+
+    //VERY IMPORTANT!!!!!!
+    //Are we using talons or are we using sparkMaxes?
+    public static final boolean usingTalons = false;
+    //Are we using Pigeon2 or Pigeon
+    public static final boolean usingPigeon2 = true;
+
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 4.8;
@@ -110,7 +117,12 @@ public final class Constants {
     public static final double kTurningFF = 0;
     public static final double kTurningMinOutput = -1;
     public static final double kTurningMaxOutput = 1;
+    
+    public static final double driveKS = 0.32;
+    public static final double driveKV = 1.51;
+    public static final double driveKA = 0.27;
 
+    public static final NeutralModeValue kDrivingMotorNeutralMode = NeutralModeValue.Brake;
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 

@@ -15,7 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 
 import frc.robot.Constants.DriveConstants;
@@ -26,34 +26,34 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-// import com.ctre.phoenix.sensors.*;  // Firmware Pigeon2-vS-Application-22.7.3.0-season2023.crf (Phoenix 5)
-import com.ctre.phoenix6.hardware.*;
-
 public class DriveSubsystem extends SubsystemBase {
+  
   // Create MAXSwerveModules
-  private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
+  private final SwerveDrive m_frontLeft = new SwerveDrive(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
-  private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+  private final SwerveDrive m_frontRight = new SwerveDrive(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
       DriveConstants.kFrontRightChassisAngularOffset);
 
-  private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+  private final SwerveDrive m_rearLeft = new SwerveDrive(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
       DriveConstants.kBackLeftChassisAngularOffset);
 
-  private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+  private final SwerveDrive m_rearRight = new SwerveDrive(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
+    
 
   // The gyro sensor
   // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-  private final Pigeon2 m_gyro = new Pigeon2(DriveConstants.kPigeon2CanId,"rio");
+  private Pigeon m_gyro = new Pigeon();
+  
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -63,11 +63,11 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.kMagnitudeSlewRate);
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
-
+  
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),
+      Rotation2d.fromDegrees(m_gyro.getYaw()),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
@@ -77,7 +77,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-
+    m_gyro.setupPigeon(DriveConstants.kPigeon2CanId, "rio");
     AutoBuilder.configureHolonomic(
       this::getPose, // Robot pose supplier
       this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
@@ -108,15 +108,19 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    SmartDashboard.putNumber("Pigeon Roll", m_gyro.getRoll().getValueAsDouble());
-    SmartDashboard.putNumber("Pigeon Yaw", m_gyro.getYaw().getValueAsDouble());
-    SmartDashboard.putNumber("Pigeon Pitch", m_gyro.getPitch().getValueAsDouble());
-    SmartDashboard.putData("Gyro", m_gyro);
+    SmartDashboard.putNumber("Pigeon Roll", m_gyro.getRoll());
+    SmartDashboard.putNumber("Pigeon Yaw", m_gyro.getYaw());
+    SmartDashboard.putNumber("Pigeon Pitch", m_gyro.getPitch());
 
-    // Update the odometry in the periodic block
-    SmartDashboard.putData("Gyro", m_gyro);
+    if (Constants.DriveConstants.usingPigeon2){
+      SmartDashboard.putData("Gyro", m_gyro.getPigeon2());
+    }
+    else {
+      SmartDashboard.putData("Gyro", m_gyro.getPigeon());
+    }
+
     m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),
+        Rotation2d.fromDegrees(m_gyro.getYaw()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -141,7 +145,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),
+        Rotation2d.fromDegrees(m_gyro.getYaw()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -221,7 +225,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     SwerveModuleState[] swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()))
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(m_gyro.getYaw()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -281,7 +285,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()).getDegrees();
+    return Rotation2d.fromDegrees(m_gyro.getYaw()).getDegrees();
   }
 
   /**
