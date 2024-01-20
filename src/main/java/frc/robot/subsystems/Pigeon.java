@@ -5,8 +5,8 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import frc.robot.Constants;
 
 public class Pigeon {
-    private Pigeon2 pigeon2;
-    private WPI_PigeonIMU pigeon;
+    private Pigeon2 pigeon2 = new Pigeon2(0);
+    private WPI_PigeonIMU pigeon = new WPI_PigeonIMU(0);
 
     public void setupPigeon(int deviceID, String canbus) {
         if (Constants.DriveConstants.usingPigeon2) {
