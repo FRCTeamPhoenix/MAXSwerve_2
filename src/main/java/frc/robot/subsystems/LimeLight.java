@@ -8,12 +8,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LimeLight extends SubsystemBase {
 
+private String deviceID;
 private boolean m_LimelightHasValidTarget = false;
 private double m_LimelightDriveX = 0.0;
 private double m_LimelightDriveY = 0.0;
 private double m_LimelightDriveRot = 0.0;
 private double m_targetArea = 0.0;
 private double m_distanceToTarget;
+
+    public LimeLight(String deviceID) {
+        this.deviceID = deviceID;
+    }
 
     public void limeLight() {
 
@@ -40,10 +45,10 @@ private double m_distanceToTarget;
         final double MAX_DRIVE = 0.4;
         final double MAX_STEER = 0.1;
 
-        double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
-        double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+        double tv = NetworkTableInstance.getDefault().getTable(deviceID).getEntry("tv").getDouble(0);
+        double tx = NetworkTableInstance.getDefault().getTable(deviceID).getEntry("tx").getDouble(0);
         //double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-        double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+        double ta = NetworkTableInstance.getDefault().getTable(deviceID).getEntry("ta").getDouble(0);
         m_targetArea = ta;
         double distance = 1 / Math.sqrt(ta);
         if (tv != 0) m_LimelightHasValidTarget = true;
