@@ -28,7 +28,7 @@ public class TalonSwerveModule {
   private final TalonFX m_drivingTalon;
   private final CurrentLimitsConfigs m_currentLimit;
   private final CANSparkMax m_turningSparkMax;
-  private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
+  private final VelocityVoltage m_voltageVelocity = new VelocityVoltage(0, 0, true, 0, 0, false, false, false);
   private final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(Constants.ModuleConstants.driveKS, Constants.ModuleConstants.driveKV, Constants.ModuleConstants.driveKA);
 
   private final AbsoluteEncoder m_turningEncoder;
@@ -48,7 +48,7 @@ public class TalonSwerveModule {
     m_drivingTalon = new TalonFX(drivingCANId);
     m_turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
     m_currentLimit = new CurrentLimitsConfigs();
-    m_currentLimit.SupplyCurrentLimit = ModuleConstants.kDrivingMotorCurrentLimit; 
+    m_currentLimit.SupplyCurrentLimit = ModuleConstants.kDrivingMotorCurrentLimit;
   
 
     
@@ -65,8 +65,8 @@ public class TalonSwerveModule {
     configs.Slot0.kD = 0.0001; // A change of 1 rotation per second squared results in 0.01 volts output
     configs.Slot0.kV = 0.12; // Falcon 500 is a 500kV motor, 500rpm per V = 8.333 rps per V, 1/8.33 = 0.12 volts / Rotation per second
     // Peak output of 8 volts
-    configs.Voltage.PeakForwardVoltage = 8;
-    configs.Voltage.PeakReverseVoltage = -8;
+    configs.Voltage.PeakForwardVoltage = 12;
+    configs.Voltage.PeakReverseVoltage = -12;
     
     /*
     // Torque-based velocity does not require a feed forward, as torque will accelerate the rotor up to the desired velocity by itself
@@ -177,9 +177,9 @@ public class TalonSwerveModule {
         new Rotation2d(m_turningEncoder.getPosition()));
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
-    driveVelocity.Velocity = optimizedDesiredState.speedMetersPerSecond * Constants.ModuleConstants.kWheelCircumferenceMeters;
-    driveVelocity.FeedForward = driveFeedForward.calculate(optimizedDesiredState.speedMetersPerSecond);
-    m_drivingTalon.setControl(driveVelocity);
+   // driveVelocity.Velocity = optimizedDesiredState.speedMetersPerSecond / Constants.ModuleConstants.kWheelCircumferenceMeters;
+   // driveVelocity.FeedForward = driveFeedForward.calculate(optimizedDesiredState.speedMetersPerSecond);
+   m_drivingTalon.setControl(m_voltageVelocity.withVelocity(optimizedDesiredState.speedMetersPerSecond / Constants.ModuleConstants.kWheelCircumferenceMeters));
 
     m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
 

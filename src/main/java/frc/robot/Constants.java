@@ -28,9 +28,9 @@ public final class Constants {
 
     //VERY IMPORTANT!!!!!!
     //Are we using talons or are we using sparkMaxes?
-    public static final boolean usingTalons = false;
+    public static final boolean usingTalons = true;
     //Are we using Pigeon2 or Pigeon
-    public static final boolean usingPigeon2 = true;
+    public static final boolean usingPigeon2 = false;
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
@@ -60,14 +60,14 @@ public final class Constants {
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 5;
-    public static final int kRearLeftDrivingCanId = 8;
     public static final int kFrontRightDrivingCanId = 6;
     public static final int kRearRightDrivingCanId = 7;
+    public static final int kRearLeftDrivingCanId = 8;
 
     public static final int kFrontLeftTurningCanId = 1;
-    public static final int kRearLeftTurningCanId = 4;
     public static final int kFrontRightTurningCanId = 2;
     public static final int kRearRightTurningCanId = 3;
+    public static final int kRearLeftTurningCanId = 4;
     
     public static final int kPigeon2CanId = 9;
 
@@ -118,15 +118,15 @@ public final class Constants {
     public static final double kTurningMinOutput = -1;
     public static final double kTurningMaxOutput = 1;
     
-    public static final double driveKS = 0.32;
-    public static final double driveKV = 1.51;
-    public static final double driveKA = 0.27;
+    public static final double driveKS = 0.5;
+    public static final double driveKV = 2.22;
+    public static final double driveKA = 0.11;
 
     public static final NeutralModeValue kDrivingMotorNeutralMode = NeutralModeValue.Brake;
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 50; // amps
+    public static final int kDrivingMotorCurrentLimit = 40; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
