@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.*;  // Firmware Pigeon2-vS-Application-22.7.3.0-season2023.crf (Phoenix 5)
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;  // Firmware Pigeon2-vS-Application-22.7.3.0-season2023.crf (Phoenix 5)
 import com.ctre.phoenix6.hardware.Pigeon2;
 import frc.robot.Constants;
 

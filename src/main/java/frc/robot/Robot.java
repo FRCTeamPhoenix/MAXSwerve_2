@@ -57,7 +57,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     LimeLight frontLimeLight = m_robotContainer.getm_frontLimeLight();
-    LimeLight rearLimeLight = m_robotContainer.getm_rearLimeLight();
     DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
     double[] pose = {m_drive.getPose().getX(), m_drive.getPose().getY(), m_drive.getPose().getRotation().getDegrees()};
 

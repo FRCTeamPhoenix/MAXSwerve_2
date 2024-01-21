@@ -177,8 +177,6 @@ public class TalonSwerveModule {
         new Rotation2d(m_turningEncoder.getPosition()));
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
-    //m_drivingTalon.set();
-
     driveVelocity.Velocity = optimizedDesiredState.speedMetersPerSecond * Constants.ModuleConstants.kWheelCircumferenceMeters;
     driveVelocity.FeedForward = driveFeedForward.calculate(optimizedDesiredState.speedMetersPerSecond);
     m_drivingTalon.setControl(driveVelocity);
