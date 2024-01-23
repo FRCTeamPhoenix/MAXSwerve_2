@@ -32,10 +32,17 @@ public class OakCameraObject {
     public int getDistanceCamera() {
         return this.distanceCamera;    
     }
-    public String gettype() {
+    public String getType() {
         return this.type;   
     }
     public Double getDistance() {
         return this.distance;  
+    }
+    public void printData() {
+        System.out.println(getXAngle());
+        System.out.println(getYAngle());
+        System.out.println(getArea());
+        System.out.println(getType());
+        System.out.println(getDistance());
     }
 }

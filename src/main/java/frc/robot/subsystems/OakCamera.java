@@ -15,8 +15,6 @@ import frc.utils.OakCameraObject;
 
 public class OakCamera extends SubsystemBase {
 
-  private List<OakCameraObject> cameraObjects = null;
-
   public List<OakCameraObject> extractOakData() {
     List<OakCameraObject> cameraObjects = new ArrayList<>();
     String[] cameraPredictions = NetworkTableInstance.getDefault().getTable("oakCamera").getEntry("cameraItems").getStringArray(null);
@@ -26,19 +24,14 @@ public class OakCamera extends SubsystemBase {
     return cameraObjects;
   }
 
-  @Override
-  public void periodic() {
-      // This method will be called once per scheduler run
-      extractOakData();
-  }
-
   public OakCameraObject findClosestNote() {
+    List<OakCameraObject> cameraObjects = extractOakData();
     double minimumDistance = Integer.MAX_VALUE;
     OakCameraObject closestNote = null;
     // loop through ever object the cammera detects
     for (OakCameraObject objectInstance : cameraObjects) {
       //filter out non notes
-      if (objectInstance.gettype() != "note") {
+      if (objectInstance.getType() != "note") {
         continue;
       }
       //filter out notes that are too far
@@ -49,9 +42,14 @@ public class OakCamera extends SubsystemBase {
       minimumDistance = objectInstance.getDistance();
       closestNote = objectInstance;
     }
-    // return the colsest notes
+    // return the closest notes
     return closestNote;
   }
 
+  @Override
+  public void periodic() {
+      // This method will be called once per scheduler run
+      findClosestNote().printData();
+  }
 }
 
