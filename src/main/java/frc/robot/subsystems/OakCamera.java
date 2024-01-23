@@ -1,20 +1,27 @@
 package frc.robot.subsystems;
+import java.util.*;
 
+import java.util.List;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //import frc.robot.commands.*;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.utils.OakCameraObject;
 
 public class OakCamera extends SubsystemBase {
 
+  private List<OakCameraObject> cameraObjects = null;
 
-  public extractOakData() {
-    private List<oakCameraObject> cameraObjects;
-    private String[] cameraPredictions = NetworkTableInstance.getDefault().getTable("oakCamera").getEntry("cameraItems").getStringArray(0)
-    for (String objectData : cameraPredictions) {
-      cameraObjects.add(new oakCameraObject(cameraPredictions[objectData]));
+  public List<OakCameraObject> extractOakData() {
+    List<OakCameraObject> cameraObjects = new ArrayList<>();
+    String[] cameraPredictions = NetworkTableInstance.getDefault().getTable("oakCamera").getEntry("cameraItems").getStringArray(null);
+    for (int objectNumber = 0; objectNumber < cameraPredictions.length; objectNumber++ ) {
+      cameraObjects.add(new OakCameraObject(cameraPredictions[objectNumber]));
     }
     return cameraObjects;
   }
@@ -25,27 +32,26 @@ public class OakCamera extends SubsystemBase {
       extractOakData();
   }
 
-  public boolean findClosestNote() {
-    private minimumDistance;
-    private closestNote;
-    for (oakCameraObject objectNumber : cameraObjects) {
-      if cameraObjects[objectNumber].returnData(type) != "note"{
+  public OakCameraObject findClosestNote() {
+    double minimumDistance = Integer.MAX_VALUE;
+    OakCameraObject closestNote = null;
+    // loop through ever object the cammera detects
+    for (OakCameraObject objectInstance : cameraObjects) {
+      //filter out non notes
+      if (objectInstance.gettype() != "note") {
         continue;
       }
-      if 
+      //filter out notes that are too far
+      if (objectInstance.getDistance() >= minimumDistance) {
+        continue;
+      }
+      //update closest notes
+      minimumDistance = objectInstance.getDistance();
+      closestNote = objectInstance;
     }
+    // return the colsest notes
+    return closestNote;
   }
 
- // public double getLLDriveSpeed() {
-    //return m_LimelightDriveCommand;
-  //}
-
-  public double getLLTurnSpeed() {
-    return m_LimelightDriveRot;
-  }
-
-  public double getLLTargetArea() {
-    return m_targetArea;
-  }
 }
 
