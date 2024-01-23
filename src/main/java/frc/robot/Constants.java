@@ -29,7 +29,7 @@ public final class Constants {
     //VERY IMPORTANT!!!!!!
     //Are we using talons or are we using sparkMaxes?
     public static final boolean usingTalons = true;
-    //Are we using Pigeon2 or Pigeon
+    //Are we using Pigeon2 or Pigeon?
     public static final boolean usingPigeon2 = false;
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
@@ -58,7 +58,7 @@ public final class Constants {
     public static final double kBackLeftChassisAngularOffset = Math.PI;
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
-    // SPARK MAX CAN IDs
+    // Motor CAN IDs
     public static final int kFrontLeftDrivingCanId = 5;
     public static final int kFrontRightDrivingCanId = 6;
     public static final int kRearRightDrivingCanId = 7;
@@ -68,7 +68,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 2;
     public static final int kRearRightTurningCanId = 3;
     public static final int kRearLeftTurningCanId = 4;
-    
+
     public static final int kPigeon2CanId = 9;
 
     public static final boolean kGyroReversed = false;
@@ -118,15 +118,28 @@ public final class Constants {
     public static final double kTurningMinOutput = -1;
     public static final double kTurningMaxOutput = 1;
     
+    //Intake CAN IDs
+    public static final int kLeftIntakeCanId = 10;
+    public static final int kRightIntakeCanId = 11;
+
+    public static final double kIntakeP = 0.04;
+    public static final double kIntakeI = 0;
+    public static final double kIntakeD = 0;
+    public static final double kIntakeFF = 1 / kDriveWheelFreeSpeedRps;
+    public static final double kIntakeMinOutput = -1;
+    public static final double kIntakeMaxOutput = 1;
+
     public static final double driveKS = 0.5;
     public static final double driveKV = 2.22;
     public static final double driveKA = 0.11;
 
     public static final NeutralModeValue kDrivingMotorNeutralMode = NeutralModeValue.Brake;
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
+    public static final IdleMode kIntakeMotorIdleMode = IdleMode.kCoast;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
     public static final int kDrivingMotorCurrentLimit = 40; // amps
+    public static final int kIntakeMotorCurrentLimit = 40; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 

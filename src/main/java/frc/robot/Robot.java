@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LimeLight;
 
 // import edu.wpi.first.math.MathUtil;
@@ -57,6 +58,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     LimeLight frontLimeLight = m_robotContainer.getm_frontLimeLight();
+    Intake m_intake = m_robotContainer.getm_intake();
     DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
     double[] pose = {m_drive.getPose().getX(), m_drive.getPose().getY(), m_drive.getPose().getRotation().getDegrees()};
 
@@ -85,6 +87,8 @@ public class Robot extends TimedRobot {
                 m_drive.drive(0.0, 0.0, 0.0, false, false);
           }
         }
+        
+    m_intake.setDesiredVelocity(m_robotContainer.getxboxDriver().getRightTriggerAxis());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

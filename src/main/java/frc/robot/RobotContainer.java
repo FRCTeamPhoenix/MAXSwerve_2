@@ -21,6 +21,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LimeLight;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -40,6 +41,8 @@ public class RobotContainer {
   // The robot's subsystems
   public final LimeLight m_frontLimeLight = new LimeLight();
   public final LimeLight m_rearLimeLight = new LimeLight();
+
+  public final Intake m_intake = new Intake(Constants.ModuleConstants.kLeftIntakeCanId, Constants.ModuleConstants.kRightIntakeCanId);
 
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("ChargerDance");
@@ -113,6 +116,10 @@ public class RobotContainer {
 
   public LimeLight getm_rearLimeLight() {
     return m_rearLimeLight;
+  }
+
+  public Intake getm_intake() {
+    return m_intake;
   }
 
   public XboxController getxboxDriver() {
