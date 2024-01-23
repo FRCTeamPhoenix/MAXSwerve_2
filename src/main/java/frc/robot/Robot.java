@@ -98,7 +98,7 @@ public class Robot extends TimedRobot {
         {
           if (currentLimeLight.hasValidTarget())
           {
-            m_drive.drive(currentLimeLight.getLLDriveX() * driveFlip, currentLimeLight.getLLDriveY() * driveFlip, currentLimeLight.getLLDriveRotation(), false, false);
+            m_drive.drive(currentLimeLight.getLLDriveY() * driveFlip, currentLimeLight.getLLDriveX() * driveFlip, currentLimeLight.getLLDriveRotation(), false, false);
           }
           else
           {
