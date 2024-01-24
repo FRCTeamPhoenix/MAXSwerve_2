@@ -35,7 +35,11 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-
+  private LimeLight frontLimeLight;
+  private LimeLight rearLimeLight;
+  private LimeLight currentLimeLight;
+  private String currentLimeLightString = "Front";
+  private double driveFlip = 1;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -45,6 +49,9 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    frontLimeLight = m_robotContainer.getm_frontLimeLight();
+    rearLimeLight = m_robotContainer.getm_rearLimeLight();
+    currentLimeLight = frontLimeLight;
   }
 
   /**
@@ -56,30 +63,42 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    LimeLight frontLimeLight = m_robotContainer.getm_frontLimeLight();
-    LimeLight rearLimeLight = m_robotContainer.getm_rearLimeLight();
+    frontLimeLight = m_robotContainer.getm_frontLimeLight();
+    rearLimeLight = m_robotContainer.getm_rearLimeLight();
     DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
     double[] pose = {m_drive.getPose().getX(), m_drive.getPose().getY(), m_drive.getPose().getRotation().getDegrees()};
 
+    if (m_robotContainer.getxboxDriver().getPOV() == 0){
+      currentLimeLight = frontLimeLight;
+      currentLimeLightString = "Front";
+      driveFlip = 1;
+    }
+    else if (m_robotContainer.getxboxDriver().getPOV() == 180){
+      currentLimeLight = rearLimeLight;
+      currentLimeLightString = "Rear";
+      driveFlip = -1;
+    }
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
-    SmartDashboard.putBoolean("Tracking: ", m_robotContainer.getxboxDriver().getAButton());
-    SmartDashboard.putNumber("Steer: ", frontLimeLight.m_LimelightDriveRot);
-    SmartDashboard.putNumber("DriveX: ", frontLimeLight.m_LimelightDriveX);
-    SmartDashboard.putNumber("DriveY: ", frontLimeLight.m_LimelightDriveY);
-    SmartDashboard.putNumber("TA: ", frontLimeLight.m_targetArea);
-    SmartDashboard.putNumber("Distance to target: ", frontLimeLight.m_distanceToTarget);
+    CommandScheduler.getInstance().run();
+    currentLimeLight.Update_Limelight_Tracking();
+    SmartDashboard.putNumber("Steer: ", currentLimeLight.getLLDriveRotation());
+    SmartDashboard.putNumber("DriveX: ", currentLimeLight.getLLDriveX());
+    SmartDashboard.putNumber("DriveY: ", currentLimeLight.getLLDriveY());
+    SmartDashboard.putNumber("TA: ", currentLimeLight.getLLTargetArea());
+    SmartDashboard.putNumber("Distance to target: ", currentLimeLight.getLLTargetDistance());
+    SmartDashboard.putString("Current LimeLight: ", currentLimeLightString);
     SmartDashboard.putNumberArray("RobotPose", pose);
     CommandScheduler.getInstance().run();
-    frontLimeLight.Update_Limelight_Tracking();
+    currentLimeLight.Update_Limelight_Tracking();
     boolean trackTarget = m_robotContainer.getxboxDriver().getAButton();
     if (trackTarget)
         {
-          if (frontLimeLight.hasValidTarget())
+          if (currentLimeLight.hasValidTarget())
           {
-            m_drive.drive(frontLimeLight.m_LimelightDriveX, frontLimeLight.m_LimelightDriveY, frontLimeLight.m_LimelightDriveRot, false, false);
+            m_drive.drive(currentLimeLight.getLLDriveY() * driveFlip, currentLimeLight.getLLDriveX() * driveFlip, currentLimeLight.getLLDriveRotation(), false, false);
           }
           else
           {
