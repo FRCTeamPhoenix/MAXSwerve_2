@@ -288,6 +288,10 @@ public class DriveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(m_gyro.getYaw()).getDegrees();
   }
 
+  public Rotation2d getRotation() {
+    return Rotation2d.fromDegrees(m_gyro.getYaw());
+  }
+
   /**
    * Returns the turn rate of the robot.
    *
@@ -296,4 +300,11 @@ public class DriveSubsystem extends SubsystemBase {
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
+
+  public SwerveModulePosition[] getModulePositions() {
+    SwerveModulePosition[] s = {m_frontLeft.getPosition(), m_frontRight.getPosition(), m_rearLeft.getPosition(), m_rearRight.getPosition()};
+    return s;
+  }
+
+  
 }
