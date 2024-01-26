@@ -29,22 +29,22 @@ import com.pathplanner.lib.util.ReplanningConfig;
 public class DriveSubsystem extends SubsystemBase {
   
   // Create MAXSwerveModules
-  private SwerveDrive m_frontLeft = new TalonSwerve(
+  private SwerveDrive m_frontLeft = new SwerveDrive(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
-  private SwerveDrive m_frontRight = new TalonSwerve(
+  private SwerveDrive m_frontRight = new SwerveDrive(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
       DriveConstants.kFrontRightChassisAngularOffset);
 
-  private SwerveDrive m_rearLeft = new TalonSwerve(
+  private SwerveDrive m_rearLeft = new SwerveDrive(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
       DriveConstants.kBackLeftChassisAngularOffset);
 
-  private SwerveDrive m_rearRight = new TalonSwerve(
+  private SwerveDrive m_rearRight = new SwerveDrive(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
@@ -76,29 +76,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    //Check if we are using SPARK MAXES instead of Talons, and act accordingly
-    if (!Constants.DriveConstants.usingTalons){
-      m_frontLeft = new MAXSwerve(
-      DriveConstants.kFrontLeftDrivingCanId,
-      DriveConstants.kFrontLeftTurningCanId,
-      DriveConstants.kFrontLeftChassisAngularOffset);
-
-      m_frontRight = new MAXSwerve(
-      DriveConstants.kFrontRightDrivingCanId,
-      DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightChassisAngularOffset);
-
-      m_rearLeft = new MAXSwerve(
-      DriveConstants.kRearLeftDrivingCanId,
-      DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kBackLeftChassisAngularOffset);
-
-      m_rearRight = new MAXSwerve(
-      DriveConstants.kRearRightDrivingCanId,
-      DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kBackRightChassisAngularOffset);
-    }
-
     if (Constants.DriveConstants.usingPigeon2){
         m_gyro = new IMU_Pigeon2();
         m_gyro.setupPigeon(DriveConstants.kOldPigeonCanId, "rio");
