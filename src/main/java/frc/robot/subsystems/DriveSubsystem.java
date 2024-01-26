@@ -29,30 +29,29 @@ import com.pathplanner.lib.util.ReplanningConfig;
 public class DriveSubsystem extends SubsystemBase {
   
   // Create MAXSwerveModules
-  private final SwerveDrive m_frontLeft = new SwerveDrive(
+  private SwerveDrive m_frontLeft = new TalonSwerve(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
-  private final SwerveDrive m_frontRight = new SwerveDrive(
+  private SwerveDrive m_frontRight = new TalonSwerve(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
       DriveConstants.kFrontRightChassisAngularOffset);
 
-  private final SwerveDrive m_rearLeft = new SwerveDrive(
+  private SwerveDrive m_rearLeft = new TalonSwerve(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
       DriveConstants.kBackLeftChassisAngularOffset);
 
-  private final SwerveDrive m_rearRight = new SwerveDrive(
+  private SwerveDrive m_rearRight = new TalonSwerve(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
     
 
   // The gyro sensor
-  // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-  private Pigeon m_gyro = new Pigeon();
+  private PigeonBase m_gyro = new IMU_Pigeon();
   
 
   // Slew rate filter variables for controlling lateral acceleration
@@ -77,7 +76,36 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    m_gyro.setupPigeon(DriveConstants.kPigeon2CanId, "rio");
+    //Check if we are using SPARK MAXES instead of Talons, and act accordingly
+    if (!Constants.DriveConstants.usingTalons){
+      m_frontLeft = new MAXSwerve(
+      DriveConstants.kFrontLeftDrivingCanId,
+      DriveConstants.kFrontLeftTurningCanId,
+      DriveConstants.kFrontLeftChassisAngularOffset);
+
+      m_frontRight = new MAXSwerve(
+      DriveConstants.kFrontRightDrivingCanId,
+      DriveConstants.kFrontRightTurningCanId,
+      DriveConstants.kFrontRightChassisAngularOffset);
+
+      m_rearLeft = new MAXSwerve(
+      DriveConstants.kRearLeftDrivingCanId,
+      DriveConstants.kRearLeftTurningCanId,
+      DriveConstants.kBackLeftChassisAngularOffset);
+
+      m_rearRight = new MAXSwerve(
+      DriveConstants.kRearRightDrivingCanId,
+      DriveConstants.kRearRightTurningCanId,
+      DriveConstants.kBackRightChassisAngularOffset);
+    }
+
+    if (Constants.DriveConstants.usingPigeon2){
+        m_gyro = new IMU_Pigeon2();
+        m_gyro.setupPigeon(DriveConstants.kOldPigeonCanId, "rio");
+    }
+    else{
+        m_gyro.setupPigeon(DriveConstants.kPigeonCanId, "rio");
+    }
     AutoBuilder.configureHolonomic(
       this::getPose, // Robot pose supplier
       this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
@@ -111,8 +139,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pigeon Roll", m_gyro.getRoll());
     SmartDashboard.putNumber("Pigeon Yaw", m_gyro.getYaw());
     SmartDashboard.putNumber("Pigeon Pitch", m_gyro.getPitch());
-
-    if (Constants.DriveConstants.usingPigeon2){
+    if (DriveConstants.usingPigeon2){
       SmartDashboard.putData("Gyro", m_gyro.getPigeon2());
     }
     else {

@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -28,8 +27,7 @@ public class TalonSwerveModule {
   private final TalonFX m_drivingTalon;
   private final CurrentLimitsConfigs m_currentLimit;
   private final CANSparkMax m_turningSparkMax;
-  private final VelocityVoltage m_voltageVelocity = new VelocityVoltage(0, 0, true, 0, 0, false, false, false);
-  private final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(Constants.ModuleConstants.driveKS, Constants.ModuleConstants.driveKV, Constants.ModuleConstants.driveKA);
+  private final VelocityVoltage m_voltageVelocity = new VelocityVoltage(0, 0, false, 0, 0, false, false, false);
 
   private final AbsoluteEncoder m_turningEncoder;
 
@@ -41,56 +39,43 @@ public class TalonSwerveModule {
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
    * encoder, and PID controller. This configuration is specific to the REV
-   * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
+   * MAXSwerve Module built with TalonFX driving motors, SPARK MAX turning motors, and a Through Bore
    * Encoder.
    */
   public TalonSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
     m_drivingTalon = new TalonFX(drivingCANId);
     m_turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
+
     m_currentLimit = new CurrentLimitsConfigs();
     m_currentLimit.SupplyCurrentLimit = ModuleConstants.kDrivingMotorCurrentLimit;
   
-
-    
-    // Factory reset, so we get the SPARKS MAX to a known state before configuring
+    // Factory reset, so we get the SPARK MAX to a known state before configuring
     // them. This is useful in case a SPARK MAX is swapped out.
     m_turningSparkMax.restoreFactoryDefaults();
 
     // Configuring TalonFX
     TalonFXConfiguration configs = new TalonFXConfiguration();
 
-    /* Voltage-based velocity requires a feed forward to account for the back-emf of the motor */
-    configs.Slot0.kP = 0.11; // An error of 1 rotation per second results in 2V output
-    configs.Slot0.kI = 0.5; // An error of 1 rotation per second increases output by 0.5V every second
-    configs.Slot0.kD = 0.0001; // A change of 1 rotation per second squared results in 0.01 volts output
-    configs.Slot0.kV = 0.12; // Falcon 500 is a 500kV motor, 500rpm per V = 8.333 rps per V, 1/8.33 = 0.12 volts / Rotation per second
-    // Peak output of 8 volts
-    configs.Voltage.PeakForwardVoltage = 12;
-    configs.Voltage.PeakReverseVoltage = -12;
-    
-    /*
-    // Torque-based velocity does not require a feed forward, as torque will accelerate the rotor up to the desired velocity by itself
-    configs.Slot1.kP = 5; // An error of 1 rotation per second results in 5 amps output
-    configs.Slot1.kI = 0.1; // An error of 1 rotation per second increases output by 0.1 amps every second
-    configs.Slot1.kD = 0.001; // A change of 1000 rotation per second squared results in 1 amp output
+    // Voltage-based velocity requires a feed forward to account for the back-emf of the motor
+    configs.Slot0.kP = ModuleConstants.kTalonDrivingP;
+    configs.Slot0.kI = ModuleConstants.kTalonDrivingI;
+    configs.Slot0.kD = ModuleConstants.kTalonDrivingD; 
+    configs.Slot0.kV = ModuleConstants.kTalonDrivingV;
+    configs.Voltage.PeakForwardVoltage = ModuleConstants.kTalonDrivingPeakForwardVoltage;
+    configs.Voltage.PeakReverseVoltage = ModuleConstants.kTalonDrivingPeakReverseVoltage;
 
-    // Peak output of 40 amps
-    configs.TorqueCurrent.PeakForwardTorqueCurrent = 40;
-    configs.TorqueCurrent.PeakReverseTorqueCurrent = -40;
-    */
-
-    /* Retry config apply up to 5 times, report if failure */
+    // Retry config apply up to 5 times, report if failure
     StatusCode status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
       status = m_drivingTalon.getConfigurator().apply(configs);
+      m_drivingTalon.getConfigurator().apply(m_currentLimit);
       if (status.isOK()) break;
     }
     if(!status.isOK()) {
       System.out.println("Could not apply configs, error code: " + status.toString());
     }
 
-
-    // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
+    // Setup encoders and PID controllers for the turning SPARK MAX.
     m_turningEncoder = m_turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
     m_turningPIDController = m_turningSparkMax.getPIDController();
     m_turningPIDController.setFeedbackDevice(m_turningEncoder);
@@ -125,7 +110,6 @@ public class TalonSwerveModule {
     m_drivingTalon.setNeutralMode(ModuleConstants.kDrivingMotorNeutralMode);
     m_turningSparkMax.setIdleMode(ModuleConstants.kTurningMotorIdleMode);
 
-    m_drivingTalon.getConfigurator().apply(m_currentLimit);
     m_turningSparkMax.setSmartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
 
     // Save the SPARK MAX configurations. If a SPARK MAX browns out during
@@ -145,7 +129,7 @@ public class TalonSwerveModule {
   public SwerveModuleState getState() {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
-    return new SwerveModuleState(m_drivingTalon.getVelocity().getValueAsDouble() * Constants.ModuleConstants.kWheelCircumferenceMeters,
+    return new SwerveModuleState(m_drivingTalon.getVelocity().getValueAsDouble() * Constants.ModuleConstants.kTalonEncoderFactor,
         new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
   }
   /**
@@ -157,7 +141,7 @@ public class TalonSwerveModule {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModulePosition(
-            m_drivingTalon.getPosition().getValueAsDouble() * Constants.ModuleConstants.kWheelCircumferenceMeters,
+            m_drivingTalon.getPosition().getValueAsDouble() * Constants.ModuleConstants.kTalonEncoderFactor,
         new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
   }
 
@@ -176,11 +160,8 @@ public class TalonSwerveModule {
     SwerveModuleState optimizedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
         new Rotation2d(m_turningEncoder.getPosition()));
 
-    // Command driving and turning SPARKS MAX towards their respective setpoints.
-   // driveVelocity.Velocity = optimizedDesiredState.speedMetersPerSecond / Constants.ModuleConstants.kWheelCircumferenceMeters;
-   // driveVelocity.FeedForward = driveFeedForward.calculate(optimizedDesiredState.speedMetersPerSecond);
-   m_drivingTalon.setControl(m_voltageVelocity.withVelocity(optimizedDesiredState.speedMetersPerSecond / Constants.ModuleConstants.kWheelCircumferenceMeters));
-
+    // Command driving and turning motors towards their respective setpoints.
+    m_drivingTalon.setControl(m_voltageVelocity.withVelocity(optimizedDesiredState.speedMetersPerSecond / Constants.ModuleConstants.kTalonEncoderFactor));
     m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
 
     m_desiredState = desiredState;
