@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
   private LimeLight rearLimeLight;
   private LimeLight currentLimeLight;
   private String currentLimeLightString = "Front";
-  private double driveFlip = 1;
+  private double driveFlip = -1;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -71,12 +71,12 @@ public class Robot extends TimedRobot {
     if (m_robotContainer.getxboxDriver().getPOV() == 0){
       currentLimeLight = frontLimeLight;
       currentLimeLightString = "Front";
-      driveFlip = 1;
+      driveFlip = -1;
     }
     else if (m_robotContainer.getxboxDriver().getPOV() == 180){
       currentLimeLight = rearLimeLight;
       currentLimeLightString = "Rear";
-      driveFlip = -1;
+      driveFlip = 1;
     }
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
