@@ -129,8 +129,8 @@ public final class Constants {
     public static final double kTalonDrivingI = 0.5; // An error of 1 rotation per second increases output by 0.5V every second
     public static final double kTalonDrivingD = 0.0001; // A change of 1 rotation per second squared results in 0.01 volts output
     public static final double kTalonDrivingV = 0.12; // Falcon 500 is a 500kV motor, 500rpm per V = 8.333 rps per V, 1/8.33 = 0.12 volts / Rotation per second
-    public static final double kTalonDrivingPeakForwardVoltage = 8;
-    public static final double kTalonDrivingPeakReverseVoltage = -8;
+    public static final double kTalonDrivingPeakForwardVoltage = 12;
+    public static final double kTalonDrivingPeakReverseVoltage = -12;
 
     public static final double kTurningP = 1;
     public static final double kTurningI = 0;
