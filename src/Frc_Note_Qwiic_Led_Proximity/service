@@ -1,0 +1,16 @@
+[Unit]
+Description=Led Proximity Python Service
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+Type=Led-Proximity
+ExecStart=/usr/bin/python /home/pi/FRCNote/Frc_Note_Qwiic_Led_Proximity/Led_Proximity.py
+StandardInput=tty-force
+Restart=on-failure
+RestartSec=1s
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target
