@@ -11,16 +11,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LimeLight;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.LimeLight;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+// import edu.wpi.first.math.MathUtil;
+// import edu.wpi.first.wpilibj.XboxController;
+// import frc.robot.Constants.OIConstants;
+// import frc.robot.subsystems.DriveSubsystem;
+// import frc.robot.subsystems.LimeLight;
+// import edu.wpi.first.wpilibj2.command.Command;
+// import edu.wpi.first.wpilibj2.command.RunCommand;
+// import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+// import com.pathplanner.lib.auto.AutoBuilder;
+// import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 
 
@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -55,38 +56,29 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-        LimeLight limeLight = m_robotContainer.getm_limeLight();
+    LimeLight frontLimeLight = m_robotContainer.getm_frontLimeLight();
+    DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
+    double[] pose = {m_drive.getPose().getX(), m_drive.getPose().getY(), m_drive.getPose().getRotation().getDegrees()};
+
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     SmartDashboard.putBoolean("Tracking: ", m_robotContainer.getxboxDriver().getAButton());
-    SmartDashboard.putNumber("Steer: ", limeLight.m_LimelightDriveRot);
-    SmartDashboard.putNumber("DriveX: ", limeLight.m_LimelightDriveX);
-    SmartDashboard.putNumber("DriveY: ", limeLight.m_LimelightDriveY);
-    SmartDashboard.putNumber("TA: ", limeLight.m_targetArea);
-    SmartDashboard.putNumber("Distance to target: ", limeLight.m_distanceToTarget);
-
-
+    SmartDashboard.putNumber("Steer: ", frontLimeLight.m_LimelightDriveRot);
+    SmartDashboard.putNumber("DriveX: ", frontLimeLight.m_LimelightDriveX);
+    SmartDashboard.putNumber("DriveY: ", frontLimeLight.m_LimelightDriveY);
+    SmartDashboard.putNumber("TA: ", frontLimeLight.m_targetArea);
+    SmartDashboard.putNumber("Distance to target: ", frontLimeLight.m_distanceToTarget);
+    SmartDashboard.putNumberArray("RobotPose", pose);
     CommandScheduler.getInstance().run();
-    limeLight.Update_Limelight_Tracking();
+    frontLimeLight.Update_Limelight_Tracking();
     boolean trackTarget = m_robotContainer.getxboxDriver().getAButton();
-    DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
     if (trackTarget)
         {
-          // m_drive.drive(0.5, 0.0, 0.0, true, false);
-          if (limeLight.hasValidTarget())
+          if (frontLimeLight.hasValidTarget())
           {
-            m_drive.drive(limeLight.m_LimelightDriveX, limeLight.m_LimelightDriveY, limeLight.m_LimelightDriveRot, false, false);
-            // m_drive.drive(0.0, 0.0, limeLight.m_LimelightDriveRot, false, false);
-
-          //   new RunCommand(
-          //     () -> m_drive.drive(
-          //         -MathUtil.applyDeadband(-.2, OIConstants.kDriveDeadband),
-          //         -MathUtil.applyDeadband(0, OIConstants.kDriveDeadband),
-          //         -MathUtil.applyDeadband(0, OIConstants.kDriveDeadband),
-          //         true, true),
-          //     m_drive);
+            m_drive.drive(frontLimeLight.m_LimelightDriveX, frontLimeLight.m_LimelightDriveY, frontLimeLight.m_LimelightDriveRot, false, false);
           }
           else
           {
