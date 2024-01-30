@@ -38,7 +38,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotContainer {
   // The robot's subsystems
-  public final LimeLight m_limeLight = new LimeLight();
+  public final LimeLight m_frontLimeLight = new LimeLight("limelight-front");
+  public final LimeLight m_rearLimeLight = new LimeLight("limelight-rear");
 
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("ChargerDance");
@@ -106,8 +107,12 @@ public class RobotContainer {
     return autoChooser.getSelected();
   }
 
-  public LimeLight getm_limeLight() {
-    return m_limeLight;
+  public LimeLight getm_frontLimeLight() {
+    return m_frontLimeLight;
+  }
+
+  public LimeLight getm_rearLimeLight() {
+    return m_rearLimeLight;
   }
 
   public XboxController getxboxDriver() {

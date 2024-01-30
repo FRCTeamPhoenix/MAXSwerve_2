@@ -5,7 +5,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
-
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -23,8 +23,16 @@ import edu.wpi.first.math.util.Units;
  * wherever the
  * constants are needed, to reduce verbosity.
  */
+
 public final class Constants {
   public static final class DriveConstants {
+
+    //VERY IMPORTANT!!!!!!
+    //Are we using TalonFX or are we using SPARK MAX?
+    public static final boolean usingTalons = false;
+    //Are we using Pigeon2 or Pigeon
+    public static final boolean usingPigeon2 = true;
+
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 4.8;
@@ -52,17 +60,18 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 11;
-    public static final int kRearLeftDrivingCanId = 13;
-    public static final int kFrontRightDrivingCanId = 15;
-    public static final int kRearRightDrivingCanId = 17;
+    public static final int kFrontLeftTurningCanId = 1;
+    public static final int kFrontRightTurningCanId = 2;
+    public static final int kRearRightTurningCanId = 3;
+    public static final int kRearLeftTurningCanId = 4;
 
-    public static final int kFrontLeftTurningCanId = 10;
-    public static final int kRearLeftTurningCanId = 12;
-    public static final int kFrontRightTurningCanId = 14;
-    public static final int kRearRightTurningCanId = 16;
+    public static final int kFrontLeftDrivingCanId = 5;
+    public static final int kFrontRightDrivingCanId = 6;
+    public static final int kRearRightDrivingCanId = 7;
+    public static final int kRearLeftDrivingCanId = 8;
     
-    public static final int kPigeon2CanId = 20;
+    public static final int kPigeonCanId = 9;
+    public static final int kOldPigeonCanId = 20;
 
     public static final boolean kGyroReversed = false;
   }
@@ -71,19 +80,27 @@ public final class Constants {
     // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
     // This changes the drive speed of the module (a pinion gear with more teeth will result in a
     // robot that drives faster).
-    public static final int kDrivingMotorPinionTeeth = 12;
+    public static final int kNeoDrivingMotorPinionTeeth = 12;
+    public static final int kTalonDrivingMotorPinionTeeth = 14;
 
     // Invert the turning encoder, since the output shaft rotates in the opposite direction of
     // the steering motor in the MAXSwerve Module.
     public static final boolean kTurningEncoderInverted = true;
 
     // Calculations required for driving motor conversion factors and feed forward
-    public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
+    public static final double kNeoDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
     public static final double kWheelDiameterMeters = 0.0762;
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
-    public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
-    public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
+    public static final double kDrivingMotorReduction = (45.0 * 22) / (kNeoDrivingMotorPinionTeeth * 15);
+    public static final double kDriveWheelFreeSpeedRps = (kNeoDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
+        / kDrivingMotorReduction;
+
+    // Calculations required for driving motor conversion factors and feed forward
+    public static final double kTalonDrivingMotorFreeSpeedRps = 6380;
+    // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
+    public static final double kTalonDrivingMotorReduction = (45.0 * 22) / (kTalonDrivingMotorPinionTeeth * 15);
+    public static final double kTalonDriveWheelFreeSpeedRps = (kTalonDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
 
     public static final double kDrivingEncoderPositionFactor = (kWheelDiameterMeters * Math.PI)
@@ -91,18 +108,28 @@ public final class Constants {
     public static final double kDrivingEncoderVelocityFactor = ((kWheelDiameterMeters * Math.PI)
         / kDrivingMotorReduction) / 60.0; // meters per second
 
+    public static final double kTalonEncoderFactor = ((kWheelDiameterMeters * Math.PI)
+        / kTalonDrivingMotorReduction);
+
     public static final double kTurningEncoderPositionFactor = (2 * Math.PI); // radians
     public static final double kTurningEncoderVelocityFactor = (2 * Math.PI) / 60.0; // radians per second
 
     public static final double kTurningEncoderPositionPIDMinInput = 0; // radians
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
-    public static final double kDrivingP = 0.04;
-    public static final double kDrivingI = 0;
-    public static final double kDrivingD = 0;
-    public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
-    public static final double kDrivingMinOutput = -1;
-    public static final double kDrivingMaxOutput = 1;
+    public static final double kNeoDrivingP = 0.04;
+    public static final double kNeoDrivingI = 0;
+    public static final double kNeoDrivingD = 0;
+    public static final double kNeoDrivingFF = 1 / kDriveWheelFreeSpeedRps;
+    public static final double kNeoDrivingMinOutput = -1;
+    public static final double kNeoDrivingMaxOutput = 1;
+
+    public static final double kTalonDrivingP = 0.11; // An error of 1 rotation per second results in 2V output
+    public static final double kTalonDrivingI = 0.5; // An error of 1 rotation per second increases output by 0.5V every second
+    public static final double kTalonDrivingD = 0.0001; // A change of 1 rotation per second squared results in 0.01 volts output
+    public static final double kTalonDrivingV = 0.12; // Falcon 500 is a 500kV motor, 500rpm per V = 8.333 rps per V, 1/8.33 = 0.12 volts / Rotation per second
+    public static final double kTalonDrivingPeakForwardVoltage = 12;
+    public static final double kTalonDrivingPeakReverseVoltage = -12;
 
     public static final double kTurningP = 1;
     public static final double kTurningI = 0;
@@ -111,10 +138,11 @@ public final class Constants {
     public static final double kTurningMinOutput = -1;
     public static final double kTurningMaxOutput = 1;
 
+    public static final NeutralModeValue kDrivingMotorNeutralMode = NeutralModeValue.Brake;
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 50; // amps
+    public static final int kDrivingMotorCurrentLimit = 40; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
