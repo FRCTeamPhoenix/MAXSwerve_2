@@ -103,14 +103,13 @@ public final class Constants {
     public static final double kTalonDriveWheelFreeSpeedRps = (kTalonDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
 
-    
     public static final double kDrivingEncoderPositionFactor = (kWheelDiameterMeters * Math.PI)
         / kDrivingMotorReduction; // meters
     public static final double kDrivingEncoderVelocityFactor = ((kWheelDiameterMeters * Math.PI)
         / kDrivingMotorReduction) / 60.0; // meters per second
 
     public static final double kTalonEncoderFactor = ((kWheelDiameterMeters * Math.PI)
-        / kDrivingMotorReduction);
+        / kTalonDrivingMotorReduction);
 
     public static final double kTurningEncoderPositionFactor = (2 * Math.PI); // radians
     public static final double kTurningEncoderVelocityFactor = (2 * Math.PI) / 60.0; // radians per second
