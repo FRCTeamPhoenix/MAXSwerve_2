@@ -50,6 +50,7 @@ public double m_distanceToTarget;
         if (tv != 0) m_LimelightHasValidTarget = true;
         else m_LimelightHasValidTarget = false;
 
+        // if distance within 0.15 of desired distance set error to 0
         double errDistance = distance - DESIRED_TARGET_DISTANCE;
         if (Math.abs(errDistance) < 0.15) {
           errDistance = 0;

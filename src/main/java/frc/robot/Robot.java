@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LimeLight;
-
+import frc.robot.subsystems.OakCamera;
+import frc.utils.CameraDriveUtil;
+import frc.utils.OakCameraObject;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
@@ -56,29 +58,57 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
         LimeLight limeLight = m_robotContainer.getm_limeLight();
+        OakCamera oakCamera = m_robotContainer.getm_oakCamera();
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     SmartDashboard.putBoolean("Tracking: ", m_robotContainer.getxboxDriver().getAButton());
+    SmartDashboard.putBoolean("ValidTarget: ", oakCamera.hasValidTarget());
     SmartDashboard.putNumber("Steer: ", limeLight.m_LimelightDriveRot);
-    SmartDashboard.putNumber("DriveX: ", limeLight.m_LimelightDriveX);
-    SmartDashboard.putNumber("DriveY: ", limeLight.m_LimelightDriveY);
+    //SmartDashboard.putNumber("DriveX: ", CameraDriveUtil.getDriveX());
+    //SmartDashboard.putNumber("DriveY: ", CameraDriveUtil.getDriveY());
     SmartDashboard.putNumber("TA: ", limeLight.m_targetArea);
-    SmartDashboard.putNumber("Distance to target: ", limeLight.m_distanceToTarget);
+    //SmartDashboard.putNumber("Distance to target: ", limeLight.m_distanceToTarget);
 
 
     CommandScheduler.getInstance().run();
-    limeLight.Update_Limelight_Tracking();
+    //limeLight.Update_Limelight_Tracking();
+
+    double closestXAngle;
+    double closestYAngle;
+    double closestCameraDistance;
+    OakCameraObject closestNote = oakCamera.findClosestNote();
+    if (closestNote != null){
+      closestXAngle = closestNote.getXAngle();
+      closestYAngle = closestNote.getYAngle();
+      closestCameraDistance = closestNote.getCameraDistance();
+    }
+    else{
+      closestXAngle = 0;
+      closestYAngle = 0;
+      closestCameraDistance = 1000;
+    }
+
+    SmartDashboard.putNumber("Closest X Angle: ", closestXAngle);
+    SmartDashboard.putNumber("Closest Y Angle: ", closestYAngle);
+    SmartDashboard.putNumber("Distance to target: ", closestCameraDistance);
+    SmartDashboard.putBoolean("Note?: ", closestNote != null);
+
+
+
     boolean trackTarget = m_robotContainer.getxboxDriver().getAButton();
     DriveSubsystem m_drive = m_robotContainer.getm_driveTrain();
     if (trackTarget)
         {
           // m_drive.drive(0.5, 0.0, 0.0, true, false);
-          if (limeLight.hasValidTarget())
+          if (oakCamera.hasValidTarget())
           {
-            m_drive.drive(limeLight.m_LimelightDriveX, limeLight.m_LimelightDriveY, limeLight.m_LimelightDriveRot, false, false);
-            // m_drive.drive(0.0, 0.0, limeLight.m_LimelightDriveRot, false, false);
+            m_drive.drive(CameraDriveUtil.getDriveX(closestXAngle, closestYAngle, closestCameraDistance, 1000, 0.0),
+                          CameraDriveUtil.getDriveY(closestXAngle, closestYAngle, closestCameraDistance, 1000, 0.0),
+                          CameraDriveUtil.getDriveRot(closestXAngle, 0.0), false, false);
+            SmartDashboard.putBoolean("Drive Working: ", true);
+                          // m_drive.drive(0.0, 0.0, limeLight.m_LimelightDriveRot, false, false);
 
           //   new RunCommand(
           //     () -> m_drive.drive(

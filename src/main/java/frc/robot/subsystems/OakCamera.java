@@ -12,19 +12,32 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.OakCameraObject;
+import frc.utils.CameraDriveUtil;
 
 public class OakCamera extends SubsystemBase {
 
-  public List<OakCameraObject> extractOakData() {
+  public static List<OakCameraObject> extractOakData() {
     List<OakCameraObject> cameraObjects = new ArrayList<>();
-    String[] cameraPredictions = NetworkTableInstance.getDefault().getTable("oakCamera").getEntry("cameraItems").getStringArray(null);
+    String[] fallback = new String[0];
+    String[] cameraPredictions = NetworkTableInstance.getDefault().getTable("oakCamera").getEntry("cameraItems").getStringArray(fallback);
     for (int objectNumber = 0; objectNumber < cameraPredictions.length; objectNumber++ ) {
       cameraObjects.add(new OakCameraObject(cameraPredictions[objectNumber]));
     }
+    SmartDashboard.putBoolean("Data Pull Working: ", true);
     return cameraObjects;
   }
 
+  public static boolean hasValidTarget() {
+    if (extractOakData().size() != 0) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   public OakCameraObject findClosestNote() {
+    SmartDashboard.putBoolean("Find Note Working: ", true);
     List<OakCameraObject> cameraObjects = extractOakData();
     double minimumDistance = Integer.MAX_VALUE;
     OakCameraObject closestNote = null;
@@ -35,11 +48,11 @@ public class OakCamera extends SubsystemBase {
         continue;
       }
       //filter out notes that are too far
-      if (objectInstance.getDistance() >= minimumDistance) {
+      if (objectInstance.getHorizontalDistance() >= minimumDistance) {
         continue;
       }
       //update closest notes
-      minimumDistance = objectInstance.getDistance();
+      minimumDistance = objectInstance.getHorizontalDistance();
       closestNote = objectInstance;
     }
     // return the closest notes
@@ -48,8 +61,7 @@ public class OakCamera extends SubsystemBase {
 
   @Override
   public void periodic() {
-      // This method will be called once per scheduler run
-      findClosestNote().printData();
+
   }
 }
 
