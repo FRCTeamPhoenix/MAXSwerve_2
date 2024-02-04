@@ -19,11 +19,12 @@ public class OakCamera extends SubsystemBase {
   public static List<OakCameraObject> extractOakData() {
     List<OakCameraObject> cameraObjects = new ArrayList<>();
     String[] fallback = new String[0];
-    String[] cameraPredictions = NetworkTableInstance.getDefault().getTable("oakCamera").getEntry("cameraItems").getStringArray(fallback);
-    for (int objectNumber = 0; objectNumber < cameraPredictions.length; objectNumber++ ) {
-      cameraObjects.add(new OakCameraObject(cameraPredictions[objectNumber]));
+    for (int i = 0 ; i < 3 ; i++) {
+      String[] cameraPredictions = NetworkTableInstance.getDefault().getTable("oakCamera").getEntry("cameraItems_" + String.valueOf(i)).getStringArray(fallback);
+      for (int objectNumber = 0; objectNumber < cameraPredictions.length; objectNumber++ ) {
+        cameraObjects.add(new OakCameraObject(cameraPredictions[objectNumber]));
+      }
     }
-    SmartDashboard.putBoolean("Data Pull Working: ", true);
     return cameraObjects;
   }
 
