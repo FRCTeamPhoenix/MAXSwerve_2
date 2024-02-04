@@ -39,7 +39,7 @@ public class OakCamera extends SubsystemBase {
   public OakCameraObject findClosestNote() {
     SmartDashboard.putBoolean("Find Note Working: ", true);
     List<OakCameraObject> cameraObjects = extractOakData();
-    double minimumDistance = Integer.MAX_VALUE;
+    double minimumDistance = Double.MAX_VALUE;
     OakCameraObject closestNote = null;
     // loop through ever object the cammera detects
     for (OakCameraObject objectInstance : cameraObjects) {
