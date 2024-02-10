@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.List;
 
 import java.util.ArrayList;
-import java.util.List;
 
 //import frc.robot.commands.*;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -38,7 +37,6 @@ public class OakCamera extends SubsystemBase {
   }
 
   public OakCameraObject findClosestNote() {
-    SmartDashboard.putBoolean("Find Note Working: ", true);
     List<OakCameraObject> cameraObjects = extractOakData();
     double minimumDistance = Double.MAX_VALUE;
     OakCameraObject closestNote = null;
